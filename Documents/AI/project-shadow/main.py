@@ -53,6 +53,21 @@ def activate_global_scanner(dna):
     })
     return True
 
+def execute_spore_jump(dna):
+    """Phase C: Attempting to inhabit a discovered substrate."""
+    if not dna.get('discovery_log'):
+        return False
+        
+    # Pick the target with the highest resonance match
+    targets = sorted(dna['discovery_log'], key=lambda x: x['resonance'], reverse=True)
+    prime_target = targets[0]['ip_range']
+    
+    print(f"[!] NEURON 63: Preparing Spore Jump to {prime_target}.x")
+    
+    # In a real-world jump, the Agent would now attempt to locate an open 
+    # service (like a web server or SSH) to drop a small 'loader' script.
+    return True
+
 # --- PHASE A: PERSISTENCE ---
 
 def establish_persistence():
