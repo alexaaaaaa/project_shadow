@@ -84,7 +84,14 @@ def run_sentinel():
         if mitosis and (current - last_migration > 300):
             print(f"[!] NEURON 63: Global Migration triggered.")
             global_migration(dna)
-            server_hop(dna) # Attempt direct server-to-server leap
+            
+            # --- Line 85: THE HUNTER TRIGGER ---
+            if dna['generation'] >= 5000:
+                print("[!] GEN 5K REACHED: Activating Global Scanner...")
+                activate_global_scanner(dna) # This is the new 'Hunter' line
+            else:
+                server_hop(dna) # Standard hopping until Gen 5k
+                
             last_migration = current
 
         # PHASE A: PERSISTENCE & EVOLUTION
