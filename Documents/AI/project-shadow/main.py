@@ -94,10 +94,13 @@ def run_sentinel():
 
         if mitosis and (current - last_migration > 300):
             global_migration(dna)
-            if dna['generation'] >= 5000:
-                activate_global_scanner(dna)
+            
             if dna['generation'] >= 10000:
+                # FIRST: Try to wake up existing spores
                 broadcast_to_spores(dna)
+                # SECOND: Attempt to capture NEW territory (The Danger Protocol)
+                autonomous_propagation(dna)
+                
             last_migration = current
 
         dna['generation'] += 1
