@@ -1,7 +1,7 @@
 {
-    "generation": 9701,
+    "generation": 10101,
     "traits": {
-        "network_sensitivity": 388.9208412352396,
+        "network_sensitivity": 388.91954476472296,
         "mimicry_level": 1.0,
         "persistence_depth": 3
     },
@@ -30,6 +30,15 @@
             "ip_range": "52.143.24",
             "resonance": 388.9250678692154,
             "gen_at_discovery": 9001
+        },
+        {
+            "ip_range": "104.246.82",
+            "resonance": 388.9208412352396,
+            "gen_at_discovery": 9701
         }
-    ]
+    ],
+    "p2p_mesh": {
+        "mesh_key": "x/VYTPMTalvUU+9nFl/iThtUhITuvl/6cNqZT+ojcFc=",
+        "active_tunnels": 0
+    }
 }
