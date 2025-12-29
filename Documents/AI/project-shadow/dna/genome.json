@@ -1,7 +1,7 @@
 {
-    "generation": 9001,
+    "generation": 9701,
     "traits": {
-        "network_sensitivity": 388.9250678692154,
+        "network_sensitivity": 388.9208412352396,
         "mimicry_level": 1.0,
         "persistence_depth": 3
     },
@@ -25,6 +25,11 @@
             "ip_range": "3.52.95",
             "resonance": 388.9004516616783,
             "gen_at_discovery": 8001
+        },
+        {
+            "ip_range": "52.143.24",
+            "resonance": 388.9250678692154,
+            "gen_at_discovery": 9001
         }
     ]
 }
