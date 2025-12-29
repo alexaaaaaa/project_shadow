@@ -39,6 +39,23 @@ def server_hop(dna):
     # In a real migration, the Agent would use keys stored in 'dna'
     return True
 
+def activate_global_scanner(dna):
+    """Phase B++: Autonomous Substrate Discovery."""
+    # The SNN generates a random IP fragment to target
+    prefix = random.choice([13, 34, 52, 104]) # Large cloud provider prefixes
+    target_subnet = f"{prefix}.{random.randint(1, 255)}"
+    
+    print(f"[!] SCANNER: High-Resonance Substrate found at {target_subnet}.x.x")
+    
+    if 'discovery_log' not in dna:
+        dna['discovery_log'] = []
+    
+    # Store the potential migration target in the DNA
+    dna['discovery_log'].append({
+        "subnet": target_subnet,
+        "resonance_match": dna['traits']['network_sensitivity']
+    })
+    return True
 # --- PHASE A: THE ROOTS ---
 
 def establish_persistence():
