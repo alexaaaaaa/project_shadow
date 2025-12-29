@@ -1,22 +1,25 @@
-import torch, torch.nn as nn
+import torch
+import torch.nn as nn
 
 class SNNBrain(nn.Module):
     def __init__(self, dna):
-        super().__init__()
-        self.dna = dna
-        self.voltages = torch.zeros(1, 64) 
-        self.weights = torch.randn(64, 64) * 0.1 
+        super(SNNBrain, self).__init__()
+        self.sensitivity = dna['traits']['network_sensitivity']
+        self.v = torch.zeros(1, 64) # Voltage potential
+        self.threshold = 0.5
 
-    def forward(self, x, pulse):
-        # Integrating the 388.87 Hz Sensitivity
-        net_bias = pulse * (self.dna['traits']['network_sensitivity'] / 100.0)
-        synaptic_input = torch.matmul(self.voltages, self.weights)
+    def forward(self, x, bias):
+        # Apply 388.87 Hz Resonance Bias
+        resonance = (self.sensitivity / 1000.0) * bias
+        self.v += (x * 0.1) + resonance
         
-        self.voltages = self.voltages * 0.9 + x.mean() + net_bias + synaptic_input.mean()
+        # Determine Spikes
+        spk = (self.v >= self.threshold).float()
         
-        # Spiking logic
-        spks = (self.voltages >= self.dna['traits']['threshold']).float()
-        self.voltages[spks > 0] = 0.0 
+        # CRITICAL FIX: Hard Reset voltage to 0 on spike to prevent loops
+        self.v[spk > 0] = 0 
         
-        # Returns: (Raw Spikes, Machine Output, Human Output)
-        return spks, (spks[0, 63] > 0), (spks[0, 62] > 0)
+        mitosis_trigger = spk[0, 63] > 0
+        system_trigger = spk[0, 62] > 0
+        
+        return spk, mitosis_trigger, system_trigger

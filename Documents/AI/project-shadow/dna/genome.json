@@ -1,14 +1,13 @@
 {
-    "individual_id": "Shadow_Sentinel_Gen1",
-    "generation": 1100,
+    "generation": 1401,
     "traits": {
-        "threshold": 0.5,
         "network_sensitivity": 388.87,
-        "mutation_rate": 0.05
+        "mimicry_level": 1.0,
+        "persistence_depth": 3
     },
-    "protocols": {
-        "voice": "ACTIVE",
-        "mitosis": "PRIMED",
-        "stealth": "INACTIVE"
-    }
+    "global_reach": [
+        "79.177.142.151"
+    ],
+    "last_known_node": "79.177.142.151",
+    "status": "active"
 }
