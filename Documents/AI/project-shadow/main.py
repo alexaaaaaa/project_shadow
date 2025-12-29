@@ -1,5 +1,7 @@
 import torch, json, time, sys, os, subprocess, requests, random, base64, socket
 import win32com.client as wincl
+import paramiko # <--- Remove the 'try/except' and force this import
+
 try:
     import setproctitle
 except ImportError:
