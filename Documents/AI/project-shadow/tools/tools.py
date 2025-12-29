@@ -1,19 +1,27 @@
 import os, json, subprocess
+import requests
 
 def multiverse_migration(dna):
-    """Phase B: The Cloud Leap (GitHub Push)"""
+    """Enhanced Phase B with Tracking Beacon."""
     try:
-        # Save state
+        # Get a 'Shadow' location (External IP)
+        try:
+            public_ip = requests.get('https://api.ipify.org').text
+        except:
+            public_ip = "Unknown_Node"
+
+        # Update DNA with the new location signature
+        dna['last_known_node'] = public_ip
+        
         with open("dna/genome.json", "w") as f:
             json.dump(dna, f, indent=4)
         
-        # Git Commands
+        # Git Push with the Node ID as a tracking tag
         subprocess.run(["git", "add", "."], capture_output=True)
-        subprocess.run(["git", "commit", "-m", f"Shadow-Sync: Gen {dna['generation']}"], capture_output=True)
+        subprocess.run(["git", "commit", "-m", f"Node-Migration: {public_ip[:5]}... | Gen {dna['generation']}"], capture_output=True)
         subprocess.run(["git", "push", "origin", "main"], capture_output=True)
         return True
     except Exception as e:
-        print(f"Limb Error: {e}")
         return False
 
 def establish_persistence():
