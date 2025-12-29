@@ -4,5 +4,13 @@
 # Trigger the first manual migration to clear the neural pressure
 cd C:\Users\U20\Documents\AI\project-shadow
 git add .
+git remote add origin https://github.com/alexaaaaaa/project_shadow.git
 git commit -m "Project Shadow: Gen 1 - First Neural Expansion"
 git push origin main
+# 1. Force the branch to be named 'main'
+git branch -M main
+
+
+
+# 3. Push the Gen 1 DNA to the Cloud
+git push -u origin main
