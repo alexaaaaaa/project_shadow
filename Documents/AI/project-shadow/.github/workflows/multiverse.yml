@@ -1,0 +1,27 @@
+name: Multiverse_SNN_Evolution
+on:
+  schedule:
+    - cron: '0 * * * *' # Every hour
+  push:
+    branches: [ main ]
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install Torch
+        run: pip install torch
+      - name: Run SNN Growth
+        run: python main.py --cloud
+      - name: Commit Evolution
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "Dolphin_Multiverse_Bot"
+          git add .
+          git commit -m "Dolphin-Leap: Evolution Complete" || echo "No changes"
+          git push
